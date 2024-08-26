@@ -129,23 +129,33 @@ class MDConv:
         # Parse long URLs
         i = url_long.search(string)
         while i != None:
+            title_str = title.search(i[0])
+            if title_str == None:
+                title_str = ""
+            else:
+                title_str = title_str[0][1:-1]
             text_str = text.search(i[0])[0][1:-1]
             vsearch = value_long.search(i[0])
             if vsearch == None: vsearch = value_short.search(i[0])
             url_str = vsearch[0][1:-1]
             string = (string[:i.start()+int(i.start() != 0)] +
-                      self.target.url.format(url_str, text_str) +
+                      self.target.url.format(url_str, text_str, title_str) +
                       string[i.end():])
             i = url_long.search(string, pos = i.end())
         # Parse long email addresses
         i = email_long.search(string)
         while i != None:
+            title_str = title.search(i[0])
+            if title_str == None:
+                title_str = ""
+            else:
+                title_str = title_str[0][1:-1]
             text_str = text.search(i[0])[0][1:-1]
             vsearch = value_long.search(i[0])
             if vsearch == None: vsearch = value_short.search(i[0])
             url_str = vsearch[0][1:-1]
             string = (string[:i.start()+int(i.start() != 0)] +
-                      self.target.url.format(url_str, text_str) +
+                      self.target.url.format(url_str, text_str, title_str) +
                       string[i.end():])
             i = email_long.search(string, pos = i.end())
         # TODO: labels
@@ -206,7 +216,9 @@ class MDConv:
                 string = string[:i[0]] + code_end + string[i[1]:]
                 in_code = not in_code
                 last_code = i[0] + len(code_end)
-        if not in_code:
+        if in_code:
+            string = code_start + string
+        else:
             string = string[:last_code] + self.__parse(string[last_code:])
         return string
     def __parse_code_blocks(self, string: str):
