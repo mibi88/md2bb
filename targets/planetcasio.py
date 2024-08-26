@@ -12,7 +12,10 @@ https://daringfireball.net/projects/markdown/dingus
 
 import convert
 
-planetcasio = convert.Target()
+def planetcasio_on_end(string: str) -> str:
+    return string.replace("`", "\\`")
+
+planetcasio = convert.Target(planetcasio_on_end)
 planetcasio.code = "courier"
 planetcasio.hr = "[center][color=DarkRed][b]==============[b][/color][/center]"
 planetcasio.headers = [

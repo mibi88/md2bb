@@ -12,7 +12,10 @@ https://daringfireball.net/projects/markdown/dingus
 
 import convert
 
-phpbb = convert.Target()
+def phpbb_on_end(string: str) -> str:
+    return string
+
+phpbb = convert.Target(phpbb_on_end)
 
 phpbb.hr = "[center][b]==============[/b][/center]"
 phpbb.code = "tt"

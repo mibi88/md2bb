@@ -12,7 +12,7 @@ https://daringfireball.net/projects/markdown/dingus
 import re
 
 class Target:
-    def __init__(self):
+    def __init__(self, on_end):
         self.strong = "b"
         self.emphasis = "i"
         self.code = "code"
@@ -28,6 +28,7 @@ class Target:
         ]
         self.url = "[url={0}]{1}[/url]"
         self.email = "[url=mailto:{0}]{1}[/url]"
+        self.on_end = on_end
 
 class MDConv:
     def __init__(self, md: str, target: Target):
@@ -44,7 +45,7 @@ class MDConv:
             if is_block: continue
             out[i] = self.__parse_code(out[i])
         # Join the paragraphs and return the string
-        return "\n".join(out)
+        return self.target.on_end("\n".join(out))
     def __parse_title(self, string: str):
         title = re.compile(r"(^.+\n(=|-)+$|#+ +.*)", re.M)
         content = re.compile(r"[^#\n]+", re.M)
