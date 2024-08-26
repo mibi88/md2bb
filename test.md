@@ -113,3 +113,47 @@ Escaping \\\`\*\_\{\}\[\]\(\)\#\+\-\.\!test
 * list
 * list
 * list
+
+* list
++ list
+- list
+- list
+* list
++ list
+
+* mixing elements
+  1. hello
+  *  bye
+* numbers and dots
+  2. something
+  3. something else
+    * indenting further
+
+---
+
+Some text followed by
+> Some quotes
+> that span across multiple lines
+> > And other quotes, indented further
+> > that also span across multiple lines
+> And going back to a lower level
+
+I'm lazy, I'm only putting the angle bracket on the first line
+> of
+the
+long
+paragraph
+
+---
+
+This
+
+```
+very
+
+long code
+
+which spans across multiple lines
+```
+
+Shouldn't be converted.
