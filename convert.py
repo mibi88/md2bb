@@ -63,10 +63,10 @@ class MDConv:
                     if n != '#': break
                     type += 1
             if type > 0 and type <= 6:
-                content = content.search(i[0])
-                if content != None:
-                    content = content[0].strip()
-                    header = self.target.headers[type-1].format(content)
+                value = content.search(i[0])
+                if value != None:
+                    value = value[0].strip()
+                    header = self.target.headers[type-1].format(value)
                     string = string[:i.start()] + header + string[i.end():]
                     i = title.search(string, pos = i.start()+len(header))
                 else:
