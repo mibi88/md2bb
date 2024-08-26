@@ -13,6 +13,7 @@ https://daringfireball.net/projects/markdown/dingus
 import convert
 
 planetcasio = convert.Target()
+planetcasio.code = "courier"
 planetcasio.hr = "[center][color=DarkRed][b]==============[b][/color][/center]"
 planetcasio.headers = [
     "[color=DarkRed][big][b][i]{0}[/i][/b][/big][/color]",

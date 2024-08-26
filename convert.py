@@ -42,7 +42,7 @@ class MDConv:
             if is_block: continue
             out[i] = self.__parse_code(out[i])
         # Join the paragraphs and return the string
-        return "\n\n".join(out)
+        return "\n".join(out)
     def __parse_title(self, string: str):
         title = re.compile(r"(^.+\n(=|-)+$|#+ +.*)", re.M)
         content = re.compile(r"[^#\n=-]+", re.M)
@@ -119,7 +119,7 @@ class MDConv:
                                   ["*", "_"])
         return string
     def __parse_code(self, string: str) -> str:
-        code_start = re.compile(r"[^\\]`+", re.M)
+        code_start = re.compile(r"[^\\]?`+", re.M)
         i = code_start.search(string)
         tag_list = []
         while i != None:

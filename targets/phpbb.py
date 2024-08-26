@@ -14,6 +14,7 @@ import convert
 
 phpbb = convert.Target()
 
+phpbb.code = "tt"
 phpbb.headers = [
     "[size=200]{0}[/size]",
     "[size=190]{0}[/size]",
