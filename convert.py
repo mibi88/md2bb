@@ -45,7 +45,7 @@ class MDConv:
         return "\n".join(out)
     def __parse_title(self, string: str):
         title = re.compile(r"(^.+\n(=|-)+$|#+ +.*)", re.M)
-        content = re.compile(r"[^#\n=-]+", re.M)
+        content = re.compile(r"[^#\n]+", re.M)
         i = title.search(string)
         while i != None:
             setext = False
