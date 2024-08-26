@@ -53,6 +53,8 @@ Horizontal rules
 
 This is [an example](http://example.com/ "Title") inline link.
 
+[A link without a title](http://example.com/)
+
 Label:
 
 [id]: http://example.com/  "Optional Title Here"

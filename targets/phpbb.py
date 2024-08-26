@@ -14,7 +14,7 @@ import convert
 
 phpbb = convert.Target()
 
-phpbb.hr = "[center][b]==============[b][/center]"
+phpbb.hr = "[center][b]==============[/b][/center]"
 phpbb.code = "tt"
 phpbb.headers = [
     "[size=200]{0}[/size]",

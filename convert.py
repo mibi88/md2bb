@@ -26,6 +26,8 @@ class Target:
             "[h5]{0}[/h5]",
             "[h6]{0}[/h6]",
         ]
+        self.url = "[url={0}]{1}[/url]"
+        self.email = "[url=mailto:{0}]{1}[/url]"
 
 class MDConv:
     def __init__(self, md: str, target: Target):
@@ -95,6 +97,59 @@ class MDConv:
         if is_tag:
             string += tag_right
         return string
+    def __parse_urls(self, string: str) -> str:
+        # Parse URLs between angle brackets
+        url = re.compile(r"<(https?|ftp):\/\/[\x20-\x7E]+>", re.M)
+        email = re.compile(r"<[\x20-\x7E]+@[\x20-\x7E]+\.[\x20-\x7E]+>", re.M)
+        url_long = re.compile((r"([^\\]|^)\[[\x20-\x7E]+\]" +
+                               r"\((https?|ftp):\/\/[\x20-\x7E]+\ " +
+                               r"?[\x20-\x7E]*\)"), re.M)
+        email_long = re.compile(r"([^\\]|^)\[[\x20-\x7E]+\]\([\x20-\x7E]+" +
+                                r"@[\x20-\x7E]+\ ?[\x20-\x7E]*\)", re.M)
+        text = re.compile(r"\[[\x20-\x7E]+\]", re.M)
+        value_long = re.compile(r"\([\x20-\x7E]+[\x20-\x7E]+[\x20-\x7E]+\ ",
+                                re.M)
+        value_short = re.compile(r"\([\x20-\x7E]+[\x20-\x7E]+[\x20-\x7E]+\)",
+                                 re.M)
+        title = re.compile(r"\ [\x20-\x7E]+\)")
+        # Parse short URLs
+        i = url.search(string)
+        while i != None:
+            string = (string[:i.start()] +
+                      self.target.url.format(i[0][1:-1], i[0][1:-1]) +
+                      string[i.end():])
+            i = url.search(string, pos = i.end())
+        # Parse short email addresses
+        i = email.search(string)
+        while i != None:
+            string = (string[:i.start()] +
+                      self.target.email.format(i[0][1:-1], i[0][1:-1]) +
+                      string[i.end():])
+            i = email.search(string, pos = i.end())
+        # Parse long URLs
+        i = url_long.search(string)
+        while i != None:
+            text_str = text.search(i[0])[0][1:-1]
+            vsearch = value_long.search(i[0])
+            if vsearch == None: vsearch = value_short.search(i[0])
+            url_str = vsearch[0][1:-1]
+            string = (string[:i.start()+int(i.start() != 0)] +
+                      self.target.url.format(url_str, text_str) +
+                      string[i.end():])
+            i = url_long.search(string, pos = i.end())
+        # Parse long email addresses
+        i = email_long.search(string)
+        while i != None:
+            text_str = text.search(i[0])[0][1:-1]
+            vsearch = value_long.search(i[0])
+            if vsearch == None: vsearch = value_short.search(i[0])
+            url_str = vsearch[0][1:-1]
+            string = (string[:i.start()+int(i.start() != 0)] +
+                      self.target.url.format(url_str, text_str) +
+                      string[i.end():])
+            i = email_long.search(string, pos = i.end())
+        # TODO: labels
+        return string
     def __parse(self, string: str) -> str:
         bold = re.compile(r"(\*{2}.+\*{2}|_{2}.+_{2})", re.M)
         emphasis = re.compile(r"(\*.+\*|_.+_)", re.M)
@@ -117,6 +172,8 @@ class MDConv:
                                   f"[{self.target.emphasis}]",
                                   f"[/{self.target.emphasis}]",
                                   ["*", "_"])
+        # Parse URLs
+        string = self.__parse_urls(string)
         return string
     def __parse_code(self, string: str) -> str:
         code_start = re.compile(r"[^\\]?`+", re.M)
