@@ -13,7 +13,7 @@ https://daringfireball.net/projects/markdown/dingus
 import convert
 
 def planetcasio_on_end(string: str) -> str:
-    return string.replace("`", "[inlinecode]`[/inlinecode]")
+    return string.replace("`", "[noeval]`[/noeval]")
 
 def planetcasio_list_item(string: str, diff: int, numbered: bool) -> str:
     out = ""
