@@ -50,6 +50,13 @@ Horizontal rules
 
 ---
 
+	code
+		indented
+	with
+		tabs
+
+---
+
     code
 
 ---
@@ -209,3 +216,26 @@ List indentation test
                    * x
                     * y
                      * z
+
+1.test
+
+*test
+
+*	test
+	*	test
+
+---
+
+	 * mixing tabs and spaces
+	  * mixing tabs and spaces
+	   * mixing tabs and spaces
+	    * mixing tabs and spaces
+	     * mixing tabs and spaces
+
+---
+
+ 	* mixing tabs and spaces
+ 		* mixing tabs and spaces
+ 			* mixing tabs and spaces
+ 				* mixing tabs and spaces
+ 					* mixing tabs and spaces

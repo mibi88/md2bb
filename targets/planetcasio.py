@@ -26,7 +26,7 @@ def planetcasio_list_item(string: str, diff: int) -> str:
 
 def planetcasio_list_end(lastlevel: int) -> str:
     out = ""
-    for i in range(lastlevel): out += "[/list]"
+    for i in range(lastlevel+1): out += "[/list]"
     return out
 
 planetcasio = convert.Target(planetcasio_on_end, planetcasio_list_item,

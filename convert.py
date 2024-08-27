@@ -37,6 +37,7 @@ class MDConv:
         self.md = md
         self.target = target
     def parse(self) -> str:
+        self.md = self.md.replace("\t", ' '*4)
         # Split the input into paragraphs
         paragraph_change = re.compile(r"(^\n)+", re.M)
         out = paragraph_change.split(self.md)
@@ -169,6 +170,8 @@ class MDConv:
         hline = re.compile(r"( *(\*|-)){3,}", re.M)
         # Parse titles
         string = self.__parse_title(string)
+        # Parse horizontal lines
+        string = hline.sub(self.target.hr, string)
         # Parse lists
         string, is_list = self.__parse_lists(string)
         if not is_list:
@@ -176,8 +179,6 @@ class MDConv:
             string = self.__fix_line_jumps(string)
         # Parse titles
         string = self.__parse_title(string)
-        # Parse horizontal lines
-        string = hline.sub(self.target.hr, string)
         # Parse bold text
         string = self.__parse_tag(string, bold, 2, 2,
                                   f"[{self.target.strong}]",
@@ -250,9 +251,10 @@ class MDConv:
         # Handle lists
         # TODO: Numbered lists
         # TODO: Handle line jumps
-        in_list = False
-        for i in ['*', '+', '-']:
-            in_list |= string.strip().startswith(i)
+        is_list_start = re.compile(r"( |\t)*(\*|-|\+|[0-9]+\.)( |\t)+", re.M)
+        in_list = is_list_start.match(string)
+        if in_list: in_list = in_list.start() == 0
+        else: in_list = False
         if not in_list:
             return (string, False)
         lines = string.split("\n")
@@ -261,22 +263,22 @@ class MDConv:
         diff = 0
         item = ""
         for i in lines:
-            itemstart = False
-            for start in ['*', '+', '-']:
-                itemstart |= i.strip().startswith(start)
+            itemstart = is_list_start.match(i)
+            if itemstart: itemstart = itemstart.start() == 0
+            else: itemstart = False
             if string == "" and item == "":
                 # It is the beginning of an item.
                 indent = len(i)-len(i.lstrip())
                 level = indent//4+int(indent%4 > 0)
                 diff = level-lastlevel
-                item += i.lstrip().lstrip(" \t*+-")
+                item += i.lstrip().lstrip(" \t*+-123456789.")
             elif itemstart:
                 string += self.target.list_item(item, diff)
                 lastlevel = level
                 indent = len(i)-len(i.lstrip())
                 level = indent//4+int(indent%4 > 0)
                 diff = level-lastlevel
-                item = i.lstrip(" \t*+-")
+                item = i.lstrip(" \t*+-123456789.")
             else:
                 item += " "+i.lstrip()
         string += self.target.list_item(item, diff)

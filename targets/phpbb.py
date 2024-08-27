@@ -27,7 +27,7 @@ def phpbb_list_item(string: str, diff: int) -> str:
 
 def phpbb_list_end(lastlevel: int) -> str:
     out = ""
-    for i in range(lastlevel): out += "[/list]"
+    for i in range(lastlevel+1): out += "[/list]"
     return out
 
 phpbb = convert.Target(phpbb_on_end, phpbb_list_item, phpbb_list_end)
