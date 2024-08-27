@@ -15,7 +15,22 @@ import convert
 def planetcasio_on_end(string: str) -> str:
     return string.replace("`", "[inlinecode]`[/inlinecode]")
 
-planetcasio = convert.Target(planetcasio_on_end)
+def planetcasio_list_item(string: str, diff: int) -> str:
+    out = ""
+    if diff > 0:
+        for i in range(diff): out += "[list]"
+    elif diff < 0:
+        for i in range(-diff): out += "[/list]"
+    out += "[li]"+string+"[/li]"
+    return out
+
+def planetcasio_list_end(lastlevel: int) -> str:
+    out = ""
+    for i in range(lastlevel): out += "[/list]"
+    return out
+
+planetcasio = convert.Target(planetcasio_on_end, planetcasio_list_item,
+                             planetcasio_list_end)
 planetcasio.code = "courier"
 planetcasio.hr = "[center][color=DarkRed][b]==============[b][/color][/center]"
 planetcasio.headers = [

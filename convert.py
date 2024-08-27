@@ -12,7 +12,7 @@ https://daringfireball.net/projects/markdown/dingus
 import re
 
 class Target:
-    def __init__(self, on_end):
+    def __init__(self, on_end, list_item, list_end):
         self.strong = "b"
         self.emphasis = "i"
         self.code = "code"
@@ -29,6 +29,8 @@ class Target:
         self.url = "[url={0}]{1}[/url]"
         self.email = "[url=mailto:{0}]{1}[/url]"
         self.on_end = on_end
+        self.list_item = list_item
+        self.list_end = list_end
 
 class MDConv:
     def __init__(self, md: str, target: Target):
@@ -255,19 +257,29 @@ class MDConv:
             return (string, False)
         lines = string.split("\n")
         string = ""
+        lastlevel = -1
+        diff = 0
+        item = ""
         for i in lines:
             itemstart = False
             for start in ['*', '+', '-']:
                 itemstart |= i.strip().startswith(start)
-            if string == "":
-                string += i.lstrip()
+            if string == "" and item == "":
                 # It is the beginning of an item.
                 indent = len(i)-len(i.lstrip())
-                level = indent/4+int(indent%4 > 0)
+                level = indent//4+int(indent%4 > 0)
+                diff = level-lastlevel
+                item += i.lstrip().lstrip(" \t*+-")
             elif itemstart:
+                string += self.target.list_item(item, diff)
+                lastlevel = level
                 indent = len(i)-len(i.lstrip())
-                level = indent/4+int(indent%4 > 0)
-                string += "\n"+i.lstrip()
+                level = indent//4+int(indent%4 > 0)
+                diff = level-lastlevel
+                item = i.lstrip(" \t*+-")
             else:
-                string += " "+i.lstrip()
+                item += " "+i.lstrip()
+        string += self.target.list_item(item, diff)
+        lastlevel = level
+        string += self.target.list_end(lastlevel)
         return (string, True)

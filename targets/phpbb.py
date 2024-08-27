@@ -15,7 +15,22 @@ import convert
 def phpbb_on_end(string: str) -> str:
     return string
 
-phpbb = convert.Target(phpbb_on_end)
+def phpbb_list_item(string: str, diff: int) -> str:
+    out = ""
+    if diff > 0:
+        for i in range(diff): out += "[list]"
+    elif diff < 0:
+        for i in range(-diff): out += "[/list]"
+    if diff == 0: out += "[/list][list]"
+    out += string
+    return out
+
+def phpbb_list_end(lastlevel: int) -> str:
+    out = ""
+    for i in range(lastlevel): out += "[/list]"
+    return out
+
+phpbb = convert.Target(phpbb_on_end, phpbb_list_item, phpbb_list_end)
 
 phpbb.hr = "[center][b]==============[/b][/center]"
 phpbb.code = "tt"
