@@ -167,8 +167,11 @@ class MDConv:
         hline = re.compile(r"( *(\*|-)){3,}", re.M)
         # Parse titles
         string = self.__parse_title(string)
-        # Fix line jumps
-        string = self.__fix_line_jumps(string)
+        # Parse lists
+        string, is_list = self.__parse_lists(string)
+        if not is_list:
+            # Fix line jumps
+            string = self.__fix_line_jumps(string)
         # Parse titles
         string = self.__parse_title(string)
         # Parse horizontal lines
@@ -241,4 +244,30 @@ class MDConv:
             between_jumps[n] = between_jumps[n].replace("\n", " ")
         string = "\n".join(between_jumps).strip("\n")
         return string
-            
+    def __parse_lists(self, string: str) -> str:
+        # Handle lists
+        # TODO: Numbered lists
+        # TODO: Handle line jumps
+        in_list = False
+        for i in ['*', '+', '-']:
+            in_list |= string.strip().startswith(i)
+        if not in_list:
+            return (string, False)
+        lines = string.split("\n")
+        string = ""
+        for i in lines:
+            itemstart = False
+            for start in ['*', '+', '-']:
+                itemstart |= i.strip().startswith(start)
+            if string == "":
+                string += i.lstrip()
+                # It is the beginning of an item.
+                indent = len(i)-len(i.lstrip())
+                level = indent/4+int(indent%4 > 0)
+            elif itemstart:
+                indent = len(i)-len(i.lstrip())
+                level = indent/4+int(indent%4 > 0)
+                string += "\n"+i.lstrip()
+            else:
+                string += " "+i.lstrip()
+        return (string, True)

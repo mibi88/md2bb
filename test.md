@@ -144,6 +144,14 @@ Escaping \\\`\*\_\{\}\[\]\(\)\#\+\-\.\!test
   3. something else
     * indenting further
 
+* list with elements that span across
+  multiple
+  lines
+* or that fit on a single one.
+* they may contain some **formatted** text.
+* It also contains line  
+  jumps
+
 ---
 
 Some text followed by
