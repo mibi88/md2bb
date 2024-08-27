@@ -291,7 +291,12 @@ class MDConv:
                         numbered = False
                 item = i.lstrip(" \t*+-123456789.")
             else:
-                item += " "+i.lstrip()
+                if item.endswith("  "):
+                    item = item.rstrip(" ")
+                    item += "\n"+i.lstrip()
+                else:
+                    item = item.rstrip(" ")
+                    item += " "+i.lstrip()
         string += self.target.list_item(item, diff, numbered)
         lastlevel = level
         string += self.target.list_end(lastlevel)
