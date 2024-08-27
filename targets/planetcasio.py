@@ -13,7 +13,7 @@ https://daringfireball.net/projects/markdown/dingus
 import convert
 
 def planetcasio_on_end(string: str) -> str:
-    return string.replace("`", "\\`")
+    return string.replace("`", "[inlinecode]`[/inlinecode]")
 
 planetcasio = convert.Target(planetcasio_on_end)
 planetcasio.code = "courier"
@@ -26,3 +26,4 @@ planetcasio.headers = [
     "[color=DarkRed]---- {0}[/color]",
     "[color=DarkRed]----- {0}[/color]",
 ]
+planetcasio.email = "{0} ({0})"
