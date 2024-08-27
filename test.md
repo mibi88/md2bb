@@ -251,3 +251,17 @@ List type tests
 
 *  unnumbered
 1. unnumbered
+
+---
+
+Extra 
+spaces 
+test 
+
+* extra 
+  spaces 
+  test 
+  in 
+  lists 
+
+Too    many     spaces     between      words.
