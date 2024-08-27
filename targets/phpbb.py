@@ -15,13 +15,21 @@ import convert
 def phpbb_on_end(string: str) -> str:
     return string
 
-def phpbb_list_item(string: str, diff: int) -> str:
+def phpbb_list_item(string: str, diff: int, numbered: bool) -> str:
     out = ""
     if diff > 0:
-        for i in range(diff): out += "[list]"
+        for i in range(diff):
+            if numbered:
+                out += "[list=ol]"
+            else:
+                out += "[list]"
     elif diff < 0:
         for i in range(-diff): out += "[/list]"
-    if diff == 0: out += "[/list][list]"
+    if diff == 0:
+        if numbered:
+            out += "[/list][list=ol]"
+        else:
+            out += "[/list][list]"
     out += string
     return out
 

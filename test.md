@@ -239,3 +239,15 @@ List indentation test
  			* mixing tabs and spaces
  				* mixing tabs and spaces
  					* mixing tabs and spaces
+
+---
+
+List type tests
+
+1. numbered
+*  numbered
+
+---
+
+*  unnumbered
+1. unnumbered

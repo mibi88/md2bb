@@ -15,10 +15,14 @@ import convert
 def planetcasio_on_end(string: str) -> str:
     return string.replace("`", "[inlinecode]`[/inlinecode]")
 
-def planetcasio_list_item(string: str, diff: int) -> str:
+def planetcasio_list_item(string: str, diff: int, numbered: bool) -> str:
     out = ""
     if diff > 0:
-        for i in range(diff): out += "[list]"
+        for i in range(diff):
+            if numbered:
+                out += "[list=ol]"
+            else:
+                out += "[list]"
     elif diff < 0:
         for i in range(-diff): out += "[/list]"
     out += "[li]"+string+"[/li]"

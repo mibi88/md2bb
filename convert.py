@@ -262,6 +262,7 @@ class MDConv:
         lastlevel = -1
         diff = 0
         item = ""
+        numbered = False
         for i in lines:
             itemstart = is_list_start.match(i)
             if itemstart: itemstart = itemstart.start() == 0
@@ -271,17 +272,28 @@ class MDConv:
                 indent = len(i)-len(i.lstrip())
                 level = indent//4+int(indent%4 > 0)
                 diff = level-lastlevel
-                item += i.lstrip().lstrip(" \t*+-123456789.")
+                numbered = i.lstrip(" \t")
+                if len(numbered) > 0:
+                    numbered = numbered[0] in "123456789"
+                else:
+                    numbered = False
+                item += i.lstrip(" \t*+-123456789.")
             elif itemstart:
-                string += self.target.list_item(item, diff)
+                string += self.target.list_item(item, diff, numbered)
                 lastlevel = level
                 indent = len(i)-len(i.lstrip())
                 level = indent//4+int(indent%4 > 0)
                 diff = level-lastlevel
+                if diff:
+                    numbered = i.lstrip(" \t")
+                    if len(numbered) > 0:
+                        numbered = numbered[0] in "123456789"
+                    else:
+                        numbered = False
                 item = i.lstrip(" \t*+-123456789.")
             else:
                 item += " "+i.lstrip()
-        string += self.target.list_item(item, diff)
+        string += self.target.list_item(item, diff, numbered)
         lastlevel = level
         string += self.target.list_end(lastlevel)
         return (string, True)
