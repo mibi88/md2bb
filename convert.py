@@ -249,7 +249,6 @@ class MDConv:
         return string
     def __parse_lists(self, string: str) -> str:
         # Handle lists
-        # TODO: Numbered lists
         # TODO: Handle line jumps
         is_list_start = re.compile(r"( |\t)*(\*|-|\+|[0-9]+\.)( |\t)+", re.M)
         in_list = is_list_start.match(string)
