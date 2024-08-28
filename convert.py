@@ -249,7 +249,6 @@ class MDConv:
         return string
     def __parse_lists(self, string: str) -> str:
         # Handle lists
-        # TODO: Handle line jumps
         is_list_start = re.compile(r"( |\t)*(\*|-|\+|[0-9]+\.)( |\t)+", re.M)
         in_list = is_list_start.match(string)
         if in_list: in_list = in_list.start() == 0
@@ -273,10 +272,10 @@ class MDConv:
                 diff = level-lastlevel
                 numbered = i.lstrip(" \t")
                 if len(numbered) > 0:
-                    numbered = numbered[0] in "123456789"
+                    numbered = numbered[0] in "0123456789"
                 else:
                     numbered = False
-                item += i.lstrip(" \t*+-123456789.")
+                item += i.lstrip(" \t*+-0123456789.")
             elif itemstart:
                 string += self.target.list_item(item, diff, numbered)
                 lastlevel = level
@@ -286,10 +285,10 @@ class MDConv:
                 if diff:
                     numbered = i.lstrip(" \t")
                     if len(numbered) > 0:
-                        numbered = numbered[0] in "123456789"
+                        numbered = numbered[0] in "0123456789"
                     else:
                         numbered = False
-                item = i.lstrip(" \t*+-123456789.")
+                item = i.lstrip(" \t*+-0123456789.")
             else:
                 if item.endswith("  "):
                     item = item.rstrip(" ")
@@ -301,3 +300,10 @@ class MDConv:
         lastlevel = level
         string += self.target.list_end(lastlevel)
         return (string, True)
+    def __quote_stat(self, string: str) -> bool:
+        string = string.strip()
+        quoteinfo = re.compile(r"^[ >]+", re.M)
+        if string.startswith(">"):
+            levels = quoteinfo.search(string)[0].count(">")
+            return (True, levels)
+        return (False, 0)
