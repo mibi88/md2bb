@@ -34,9 +34,10 @@ class Target:
         self.quote = "quote"
 
 class MDConv:
-    def __init__(self, md: str, target: Target):
+    def __init__(self, md: str, target: Target, extra: bool):
         self.md = md
         self.target = target
+        self.extra = extra
     def parse(self) -> str:
         self.md = self.md.replace("\t", ' '*4)
         # Split the input into paragraphs
@@ -253,6 +254,9 @@ class MDConv:
                 if qdiff > 0:
                     for i in range(qdiff): l = f"[{self.target.quote}]" + l
                     lastquotelevel = qlevel
+                elif qdiff < 0 and self.extra:
+                    for i in range(-qdiff): l = f"[/{self.target.quote}]" + l
+                    lastquotelevel = qlevel
                 between_jumps[n] += l+" "
             between_jumps[n] = between_jumps[n].rstrip(" ")
         string = "\n".join(between_jumps).strip("\n")
@@ -306,11 +310,15 @@ class MDConv:
                         numbered = False
                 item = i.lstrip(" \t*+-0123456789.")
             else:
-                if items == 0:
+                if items == 0 or self.extra:
                     in_quote, qlevel, i = self.__quote_stat(i)
                     qdiff = qlevel-lastqlevel
                     if qdiff > 0:
                         for l in range(qdiff): i = f"[{self.target.quote}]" + i
+                        lastqlevel = qlevel
+                    elif qdiff < 0 and self.extra:
+                        for l in range(-qdiff):
+                            i = f"[/{self.target.quote}]" + i
                         lastqlevel = qlevel
                 if item.endswith("  "):
                     item = item.rstrip(" ")

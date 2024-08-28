@@ -38,11 +38,14 @@ parser.add_argument("file")
 parser.add_argument("-o", "--output", help = "the output file")
 parser.add_argument("-t", "--target", help = "the target website",
                     choices = targets, default = "phpbb")
+parser.add_argument("-e", "--extra", help = "enable extra Markdown features",
+                    action = "store_true")
 
 args = parser.parse_args()
 
 with open(args.file, "r") as file:
-    converter = convert.MDConv(file.read(), targets[args.target])
+    converter = convert.MDConv(file.read(), targets[args.target],
+                               args.extra == True)
     out = converter.parse()
     if args.output:
         with open(args.output, "w") as outfile:
