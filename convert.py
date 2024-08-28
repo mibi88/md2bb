@@ -84,7 +84,6 @@ class MDConv:
         if not string.count(tag): return string
         text = string.split(tag)
         formatted = string.startswith(tag)
-        print(len(text)&(~1), len(text))
         if formatted:
             string = f"[{bbcode}]"
         else:
@@ -93,10 +92,12 @@ class MDConv:
             if i != "":
                 string += text[i]
                 if formatted and i < len(text)-1:
-                    if i < len(text)&(~1)-(not len(text)&1): string += f"[/{bbcode}]"
+                    if i < len(text)&(~1)-(not len(text)&1):
+                        string += f"[/{bbcode}]"
                     else: string += tag
                 elif i < len(text)-1:
-                    if i < len(text)&(~1)-(not len(text)&1): string += f"[{bbcode}]"
+                    if i < len(text)&(~1)-(not len(text)&1):
+                        string += f"[{bbcode}]"
                     else: string += tag
                 formatted = not formatted
         return string
