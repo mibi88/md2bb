@@ -328,3 +328,15 @@ is the text still correct ?
   > quote
 
 is the text still correct ?
+
+> line jump  
+in a quote
+
+> quote in a list
+> * list
+> > quote
+>
+
+`</code>[/tt][/inlinecode][b]test[/b]`
+
+*`test`*

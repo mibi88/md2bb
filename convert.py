@@ -240,13 +240,23 @@ class MDConv:
         return (string, False)
     def __fix_line_jumps(self, string: str):
         # Regexes
+        lastquotelevel = 0
         line_jumps = re.compile(r"\ \ $", re.M)
         
         between_jumps = line_jumps.split(string)
         for n in range(len(between_jumps)):
-            between_jumps[n] = between_jumps[n].strip("\n")
-            between_jumps[n] = between_jumps[n].replace("\n", " ")
+            lines = between_jumps[n].split("\n")
+            between_jumps[n] = ""
+            for l in lines:
+                in_quote, qlevel, l = self.__quote_stat(l)
+                qdiff = qlevel-lastquotelevel
+                if qdiff > 0:
+                    for i in range(qdiff): l = f"[{self.target.quote}]" + l
+                    lastquotelevel = qlevel
+                between_jumps[n] += l+" "
+            between_jumps[n] = between_jumps[n].rstrip(" ")
         string = "\n".join(between_jumps).strip("\n")
+        for l in range(lastquotelevel): string += f"[/{self.target.quote}]"
         return string
     def __parse_lists(self, string: str) -> str:
         # Handle lists
