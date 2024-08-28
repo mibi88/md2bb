@@ -31,6 +31,7 @@ class Target:
         self.on_end = on_end
         self.list_item = list_item
         self.list_end = list_end
+        self.quote = "quote"
 
 class MDConv:
     def __init__(self, md: str, target: Target):
@@ -258,9 +259,11 @@ class MDConv:
         lines = string.split("\n")
         string = ""
         lastlevel = -1
+        lastqlevel = 0
         diff = 0
         item = ""
         numbered = False
+        items = 0
         for i in lines:
             itemstart = is_list_start.match(i)
             if itemstart: itemstart = itemstart.start() == 0
@@ -277,7 +280,10 @@ class MDConv:
                     numbered = False
                 item += i.lstrip(" \t*+-0123456789.")
             elif itemstart:
+                for l in range(lastqlevel): item += f"[/{self.target.quote}]"
                 string += self.target.list_item(item, diff, numbered)
+                items += 1
+                lastqlevel = 0
                 lastlevel = level
                 indent = len(i)-len(i.lstrip())
                 level = indent//4+int(indent%4 > 0)
@@ -290,20 +296,26 @@ class MDConv:
                         numbered = False
                 item = i.lstrip(" \t*+-0123456789.")
             else:
+                if items == 0:
+                    in_quote, qlevel, i = self.__quote_stat(i)
+                    qdiff = qlevel-lastqlevel
+                    if qdiff > 0:
+                        for l in range(qdiff): i = f"[{self.target.quote}]" + i
+                        lastqlevel = qlevel
                 if item.endswith("  "):
                     item = item.rstrip(" ")
-                    item += "\n"+i.lstrip()
+                    item += "\n"+i.lstrip(" >")
                 else:
                     item = item.rstrip(" ")
-                    item += " "+i.lstrip()
+                    item += " "+i.lstrip(" >")
+        for l in range(lastqlevel): item += f"[/{self.target.quote}]"
         string += self.target.list_item(item, diff, numbered)
-        lastlevel = level
-        string += self.target.list_end(lastlevel)
+        string += self.target.list_end(level)
         return (string, True)
-    def __quote_stat(self, string: str) -> bool:
+    def __quote_stat(self, string: str) -> tuple:
         string = string.strip()
         quoteinfo = re.compile(r"^[ >]+", re.M)
         if string.startswith(">"):
             levels = quoteinfo.search(string)[0].count(">")
-            return (True, levels)
-        return (False, 0)
+            return (True, levels, string.lstrip(" >"))
+        return (False, 0, string.lstrip(" >"))

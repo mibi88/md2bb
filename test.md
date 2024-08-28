@@ -166,6 +166,8 @@ Some text followed by
 > that span across multiple lines
 > > And other quotes, indented further
 > > that also span across multiple lines
+> This is still on the same line
+
 > And going back to a lower level
 
 I'm lazy, I'm only putting the angle bracket on the first line
@@ -173,6 +175,16 @@ I'm lazy, I'm only putting the angle bracket on the first line
 the
 long
 paragraph
+>> a
+nested
+>quote
+
+> going
+back
+to
+the
+previous
+line
 
 ---
 
@@ -285,5 +297,34 @@ Too    many     spaces     between      words.
 
 * text
 >quote in list
+>>quote in another quote
+>the quote continues
+
+>Another quote
+
+is the text still correct ?
+
+>Some more quote tests
+>>>>>>Another quote
+
+is the text still correct ?
+
+`useless    spaces    !`
+
+    more    useless     spaces   !
+
+* long list with quotes
+  > quote
+  >> quote
+  >>> quote
+* another quote
+  > quote
+  >> quote
+* something else
+
+is the text still correct ?
+
+* another test  
+  > quote
 
 is the text still correct ?
