@@ -80,26 +80,25 @@ class MDConv:
             else:
                 i = title.search(string, pos = i.end())
         return string
-    def __parse_tag(self, string: str, regex: re.Pattern, left: int, right: int,
-                    tag_left: str, tag_right: str, starts: list) -> str:
-        text = regex.split(string)
-        is_tag = False
-        for i in starts: is_tag |= string.startswith(i)
-        if is_tag:
-            string = tag_left
+    def __parse_tag(self, string: str, tag: str, bbcode: str) -> str:
+        if not string.count(tag): return string
+        text = string.split(tag)
+        formatted = string.startswith(tag)
+        print(len(text)&(~1), len(text))
+        if formatted:
+            string = f"[{bbcode}]"
         else:
             string = ""
-        for n in range(len(text)):
-            if is_tag:
-                string += text[n][left:-right]
-                string += tag_right
-                is_tag = not is_tag
-            elif n < len(text)-1:
-                string += text[n]
-                string += tag_left
-                is_tag = not is_tag
-            else:
-                string += text[n]
+        for i in range(len(text)):
+            if i != "":
+                string += text[i]
+                if formatted and i < len(text)-1:
+                    if i < len(text)&(~1)-(not len(text)&1): string += f"[/{bbcode}]"
+                    else: string += tag
+                elif i < len(text)-1:
+                    if i < len(text)&(~1)-(not len(text)&1): string += f"[{bbcode}]"
+                    else: string += tag
+                formatted = not formatted
         return string
     def __parse_urls(self, string: str) -> str:
         # Parse URLs between angle brackets
@@ -165,8 +164,6 @@ class MDConv:
         # TODO: labels
         return string
     def __parse(self, string: str) -> str:
-        bold = re.compile(r"(\*{2}.+\*{2}|_{2}.+_{2})", re.M)
-        emphasis = re.compile(r"(\*.+\*|_.+_)", re.M)
         hline = re.compile(r"( *(\*|-)){3,}", re.M)
         # Parse titles
         string = self.__parse_title(string)
@@ -180,15 +177,11 @@ class MDConv:
         # Parse titles
         string = self.__parse_title(string)
         # Parse bold text
-        string = self.__parse_tag(string, bold, 2, 2,
-                                  f"[{self.target.strong}]",
-                                  f"[/{self.target.strong}]",
-                                  ["**", "__"])
+        string = self.__parse_tag(string, "**", self.target.strong)
+        string = self.__parse_tag(string, "__", self.target.strong)
         # Parse italic text
-        string = self.__parse_tag(string, emphasis, 1, 1,
-                                  f"[{self.target.emphasis}]",
-                                  f"[/{self.target.emphasis}]",
-                                  ["*", "_"])
+        string = self.__parse_tag(string, "*", self.target.emphasis)
+        string = self.__parse_tag(string, "_", self.target.emphasis)
         # Parse URLs
         string = self.__parse_urls(string)
         return string
