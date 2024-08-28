@@ -15,7 +15,7 @@ class Target:
     def __init__(self, on_end, list_item, list_end):
         self.strong = "b"
         self.emphasis = "i"
-        self.code = "code"
+        self.code = "[code]{0}[/code]"
         self.code_block = "[code]{0}[/code]"
         self.hr = "[hr]"
         self.headers = [
@@ -100,8 +100,6 @@ class MDConv:
                 is_tag = not is_tag
             else:
                 string += text[n]
-        if is_tag:
-            string += tag_right
         return string
     def __parse_urls(self, string: str) -> str:
         # Parse URLs between angle brackets
@@ -195,40 +193,52 @@ class MDConv:
         string = self.__parse_urls(string)
         return string
     def __parse_code(self, string: str) -> str:
-        code_start = re.compile(r"[^\\]?`+", re.M)
-        i = code_start.search(string)
-        tag_list = []
-        while i != None:
-            start = i.start()
-            item = i[0]
-            if item[0] != '`':
-                item = item[1:]
-                start += 1
-            tag_list.append((start, i.end(), item))
-            i = code_start.search(string, pos = i.end())
-        
+        text_list = []
+        item = ""
+        escaped = False
         in_code = False
-        tag_len = 0
-        last_code = 0
-        code_start = f"[{self.target.code}]"
-        code_end = f"[/{self.target.code}]"
-        for i in reversed(tag_list):
-            if in_code:
-                if len(i[2]) >= tag_len:
-                    string = (self.__parse(string[:i[0]]) +
-                              string[i[0]:last_code] +
-                              self.__parse(string[last_code:]))
-                    string = string[:i[0]] + code_start + string[i[0]+tag_len:]
-                    in_code = not in_code
+        last_size = 0
+        size = 0
+        tag = ""
+        for i in reversed(string):
+            if i == '\\':
+                escaped = True
+            if i == '`' and not escaped:
+                tag += i
+                size += 1
             else:
-                tag_len = len(i[2])
-                string = string[:i[0]] + code_end + string[i[1]:]
-                in_code = not in_code
-                last_code = i[0] + len(code_end)
-        if in_code:
-            string = code_start + string
-        else:
-            string = string[:last_code] + self.__parse(string[last_code:])
+                if not in_code:
+                    if size > 0:
+                        last_size = size
+                        size = 0
+                        text_list.append((True, item))
+                        item = ""
+                        in_code = not in_code
+                        tag = ""
+                    item = i+item
+                else:
+                    if size > 0:
+                        if size >= last_size:
+                            for n in range(size-last_size): item = "`"+item
+                            size = 0
+                            text_list.append((False, item))
+                            item = ""
+                            in_code = not in_code
+                        else:
+                            item = tag+item
+                        tag = ""
+                    item = i+item
+        if item != "":
+            text_list.append((not in_code, item))
+        string = ""
+        for i in reversed(text_list):
+            if i[0]:
+                string += self.__parse(i[1])
+            else:
+                if i[1].count("\n"):
+                    string += self.target.code_block.format(i[1])
+                else:
+                    string += self.target.code.format(i[1])
         return string
     def __parse_code_blocks(self, string: str):
         code_indent = re.compile(r"^( {4}|\t)", re.M)
@@ -258,7 +268,8 @@ class MDConv:
                     for i in range(-qdiff): l = f"[/{self.target.quote}]" + l
                     lastquotelevel = qlevel
                 between_jumps[n] += l+" "
-            between_jumps[n] = between_jumps[n].rstrip(" ")
+            if between_jumps[n] != "":
+                between_jumps[n] = between_jumps[n][:-1]
         string = "\n".join(between_jumps).strip("\n")
         for l in range(lastquotelevel): string += f"[/{self.target.quote}]"
         return string
@@ -331,9 +342,8 @@ class MDConv:
         string += self.target.list_end(level)
         return (string, True)
     def __quote_stat(self, string: str) -> tuple:
-        string = string.strip()
         quoteinfo = re.compile(r"^[ >]+", re.M)
-        if string.startswith(">"):
+        if string.strip().startswith(">"):
             levels = quoteinfo.search(string)[0].count(">")
             return (True, levels, string.lstrip(" >"))
-        return (False, 0, string.lstrip(" >"))
+        return (False, 0, string)

@@ -41,7 +41,7 @@ def phpbb_list_end(lastlevel: int) -> str:
 phpbb = convert.Target(phpbb_on_end, phpbb_list_item, phpbb_list_end)
 
 phpbb.hr = "[center][b]==============[/b][/center]"
-phpbb.code = "tt"
+phpbb.code = "[tt]{0}[/tt]"
 phpbb.headers = [
     "[size=200]{0}[/size]",
     "[size=190]{0}[/size]",

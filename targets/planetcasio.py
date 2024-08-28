@@ -35,7 +35,7 @@ def planetcasio_list_end(lastlevel: int) -> str:
 
 planetcasio = convert.Target(planetcasio_on_end, planetcasio_list_item,
                              planetcasio_list_end)
-planetcasio.code = "inlinecode"
+planetcasio.code = "[courier]{0}[/courier]"
 planetcasio.hr = "[center][color=DarkRed][b]==============[b][/color][/center]"
 planetcasio.headers = [
     "[color=DarkRed][big][b][i]{0}[/i][/b][/big][/color]",
