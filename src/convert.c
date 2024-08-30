@@ -88,14 +88,14 @@ void convert(FILE *in, FILE *out, const Target *target) {
             }
         }
         /* Handle horizontal rules */
-        if((last[written] == '*' || last[written] == '-') && !escaped && 
-           !in_code && !in_code_block){
+        if(last[written] == '\n' && !escaped && !in_code && !in_code_block){
             n = 0;
-            for(i=written;i<last_sz && (last[i] == '*' || last[i] == '-' ||
+            for(i=written+1;i<last_sz && (last[i] == '*' || last[i] == '-' ||
                 last[i] == ' ');i++){
                 if(last[i] == '*' || last[i] == '-') n++;
             }
             if(n >= 3){
+                fwrite("\n", 1, 1, out);
                 fputs(target->hr, out);
                 written = i;
             }
