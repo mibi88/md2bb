@@ -37,6 +37,7 @@ void convert(FILE *in, FILE *out, const Target *target) {
     /* Used in for loops */
     size_t i;
     size_t n;
+    size_t r;
     /* freads return value. */
     int read_out;
     while((read_out = fread(&c, 1, 1, in)) || last_sz-written > 0){
@@ -60,7 +61,32 @@ void convert(FILE *in, FILE *out, const Target *target) {
             written++;
         }
         /* Handle code blocks */
-        /* TODO */
+        if(in_code_block && last[written] == '\n'){
+            n = 0;
+            r = 0;
+            for(i=written+1;i<last_sz && (last[i] == ' ' || last[i] == '\t');
+                n += last[i] == '\t' ? 4 : 1, r += n <= 4, i++);
+            if(n < 4){
+                fputs(target->code_block_end, out);
+                fwrite("\n", 1, 1, out);
+                written += 1+r;
+                in_code_block = 0;
+            }else{
+                fwrite("\n", 1, 1, out);
+                written += 1+r;
+            }
+        }else if(!in_code && last[written] == '\n'){
+            n = 0;
+            r = 0;
+            for(i=written+1;i<last_sz && (last[i] == ' ' || last[i] == '\t');
+                n += last[i] == '\t' ? 4 : 1, r += n <= 4, i++);
+            if(n >= 4){
+                fwrite("\n", 1, 1, out);
+                fputs(target->code_block_start, out);
+                written += 1+r;
+                in_code_block = 1;
+            }
+        }
         /* Handle code */
         if(last[written] == '`' && !escaped && !in_code_block){
             for(i=written;i<last_sz && last[i] == '`';i++);
