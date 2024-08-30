@@ -63,27 +63,27 @@ void convert(FILE *in, FILE *out, const Target *target) {
         /* Handle code blocks */
         if(in_code_block && last[written] == '\n'){
             n = 0;
-            r = 0;
+            r = 1;
             for(i=written+1;i<last_sz && (last[i] == ' ' || last[i] == '\t');
                 n += last[i] == '\t' ? 4 : 1, r += n <= 4, i++);
             if(n < 4){
                 fputs(target->code_block_end, out);
                 fwrite("\n", 1, 1, out);
-                written += 1+r;
+                written += r;
                 in_code_block = 0;
             }else{
                 fwrite("\n", 1, 1, out);
-                written += 1+r;
+                written += r;
             }
         }else if(!in_code && last[written] == '\n'){
             n = 0;
-            r = 0;
+            r = 1;
             for(i=written+1;i<last_sz && (last[i] == ' ' || last[i] == '\t');
                 n += last[i] == '\t' ? 4 : 1, r += n <= 4, i++);
             if(n >= 4){
                 fwrite("\n", 1, 1, out);
                 fputs(target->code_block_start, out);
-                written += 1+r;
+                written += r;
                 in_code_block = 1;
             }
         }
@@ -114,7 +114,7 @@ void convert(FILE *in, FILE *out, const Target *target) {
             }
         }
         /* Handle horizontal rules */
-        if(last[written] == '\n' && !escaped && !in_code && !in_code_block){
+        if(last[written] == '\n' && !in_code && !in_code_block){
             n = 0;
             for(i=written+1;i<last_sz && (last[i] == '*' || last[i] == '-' ||
                 last[i] == ' ');i++){
